@@ -1,0 +1,33 @@
+Conception de la base de données dbcommerce :
+
+create database dbcommerce character set'utf8';
+
+use dbcommerce;
+
+create table produit(
+codeprod varchar(20) not null primary key,
+prix_achat int not null,
+prix_vente int not null)
+engine=innodb;
+
+insert into produit(codeprod,prix_achat,prix_vente) 
+values('Ordinateur',195000,235000),
+      ('Smartphone',95000,115000),
+      ('Tablette',105000,130000);
+
+create table vente(
+annee smallint not null,
+mois varchar(15) not null,
+jour smallint not null,
+produit varchar(20) not null,
+nombre smallint not null,
+primary key(annee,mois,jour,produit))
+engine=innodb;
+
+alter table vente add constraint fk foreign key(produit)
+references produit(codeprod);
+
+create view produit_mois as
+  select annee,mois,produit,sum(nombre) as snombre,sum(prix_vente * nombre) as srecette,
+   sum(prix_vente * nombre) - sum(prix_achat * nombre) as sbenefice from vente inner join produit
+ on vente.produit=produit.codeprod group by annee,mois,produit;
